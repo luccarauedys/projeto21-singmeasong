@@ -8,6 +8,7 @@ import {
   validData,
   invalidData,
   createRecommendationAndGetId,
+  createRecommendations,
 } from './factories/recommendationFactory.js';
 
 const agent = supertest(app);
@@ -113,7 +114,26 @@ describe('GET /recommendations/:id', () => {
   });
 });
 
-// describe('GET /recommendations/random', () => {});
+describe('GET /recommendations/random', () => {
+  it('should return a status 404 when there are no songs registered', async () => {
+    const URL = '/recommendations/random';
+    const { statusCode } = await agent.get(URL);
+    expect(statusCode).toEqual(404);
+  });
+
+  it('should return an object with properties id, name, youtubeLink and score when recommendation exists', async () => {
+    await createRecommendations();
+
+    const URL = '/recommendations/random';
+    const { statusCode, body } = await agent.get(URL);
+
+    expect(statusCode).toEqual(200);
+    expect(body).toHaveProperty('id');
+    expect(body).toHaveProperty('name');
+    expect(body).toHaveProperty('youtubeLink');
+    expect(body).toHaveProperty('score');
+  });
+});
 
 // describe('GET /recommendations/top/:amount', () => {});
 
