@@ -46,8 +46,3 @@ export async function createRecommendations() {
 
   return recommendations;
 }
-
-// export async function getRecommendations() {
-//   const recommendations = await prisma.recommendation.findMany();
-//   return recommendations;
-// }

@@ -135,8 +135,29 @@ describe('GET /recommendations/random', () => {
   });
 });
 
-// describe('GET /recommendations/top/:amount', () => {});
+describe('GET /recommendations/top/:amount', () => {
+  it('should return a status 400 when amount is NaN', async () => {
+    const URL = '/recommendations/top/undefined';
+    const { statusCode } = await agent.get(URL);
+    expect(statusCode).toEqual(400);
+  });
+
+  it('should return an empty array when amount is zero', async () => {
+    const URL = '/recommendations/top/0';
+    const { body } = await agent.get(URL);
+    expect(body).toEqual([]);
+  });
+
+  it('should return a maximum of n(amount) songs', async () => {
+    const amount = 5;
+    const URL = `/recommendations/top/${amount}`;
+    const response = await agent.get(URL);
+    const recommendationsAmount = response.body.length;
+    expect(recommendationsAmount).toBeLessThanOrEqual(amount);
+  });
+});
 
 afterAll(async () => {
+  await prisma.recommendation.deleteMany();
   await prisma.$disconnect();
 });
