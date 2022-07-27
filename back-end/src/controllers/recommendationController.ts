@@ -18,6 +18,8 @@ async function insert(req: Request, res: Response) {
 async function upvote(req: Request, res: Response) {
   const { id } = req.params;
 
+  if (isNaN(+id)) return res.sendStatus(400);
+
   await recommendationService.upvote(+id);
 
   res.sendStatus(200);
@@ -25,6 +27,8 @@ async function upvote(req: Request, res: Response) {
 
 async function downvote(req: Request, res: Response) {
   const { id } = req.params;
+
+  if (isNaN(+id)) return res.sendStatus(400);
 
   await recommendationService.downvote(+id);
 
@@ -46,6 +50,8 @@ async function get(req: Request, res: Response) {
 async function getTop(req: Request, res: Response) {
   const { amount } = req.params;
 
+  if (isNaN(+amount)) return res.sendStatus(400);
+
   const recommendations = await recommendationService.getTop(+amount);
 
   res.send(recommendations);
@@ -53,6 +59,8 @@ async function getTop(req: Request, res: Response) {
 
 async function getById(req: Request, res: Response) {
   const { id } = req.params;
+
+  if (isNaN(+id)) return res.sendStatus(400);
 
   const recommendation = await recommendationService.getById(+id);
 

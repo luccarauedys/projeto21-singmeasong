@@ -1,3 +1,5 @@
+import { prisma } from '../../src/database.js';
+
 export function validData() {
   return {
     name: 'Twenty One Pilots - Chlorine',
@@ -10,4 +12,10 @@ export function invalidData() {
     name: 0,
     youtubeLink: '0',
   };
+}
+
+export async function createRecommendationAndGetId() {
+  const recommendation = validData();
+  const result = await prisma.recommendation.create({ data: recommendation });
+  return result.id;
 }

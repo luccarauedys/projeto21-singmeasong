@@ -1,7 +1,14 @@
 import supertest from 'supertest';
+
 import app from '../src/app.js';
-import { validData, invalidData } from './factories/recommendationFactory.js';
+
 import { prisma } from '../src/database.js';
+
+import {
+  validData,
+  invalidData,
+  createRecommendationAndGetId,
+} from './factories/recommendationFactory.js';
 
 const agent = supertest(app);
 
@@ -29,6 +36,56 @@ describe('POST /recommendations', () => {
     expect(statusCode).toEqual(201);
   });
 });
+
+describe('POST /recommendations/:id/upvote', () => {
+  it('should return a status 400 when id is NaN', async () => {
+    const URL = '/recommendations/undefined/upvote';
+    const { statusCode } = await agent.post(URL);
+    expect(statusCode).toEqual(400);
+  });
+
+  it('should return a status 404 when recommendation does not exist', async () => {
+    const URL = '/recommendations/0/upvote';
+    const { statusCode } = await agent.post(URL);
+    expect(statusCode).toEqual(404);
+  });
+
+  it('should return a status 200 when operation is successful', async () => {
+    const id = await createRecommendationAndGetId();
+    const URL = `/recommendations/${id}/upvote`;
+    const { statusCode } = await agent.post(URL);
+    expect(statusCode).toEqual(200);
+  });
+});
+
+describe('POST /recommendations/:id/downvote', () => {
+  it('should return a status 400 when id is NaN', async () => {
+    const URL = '/recommendations/undefined/downvote';
+    const { statusCode } = await agent.post(URL);
+    expect(statusCode).toEqual(400);
+  });
+
+  it('should return a status 404 when recommendation does not exist', async () => {
+    const URL = '/recommendations/0/downvote';
+    const { statusCode } = await agent.post(URL);
+    expect(statusCode).toEqual(404);
+  });
+
+  it('should return a status 200 when operation is successful', async () => {
+    const id = await createRecommendationAndGetId();
+    const URL = `/recommendations/${id}/downvote`;
+    const { statusCode } = await agent.post(URL);
+    expect(statusCode).toEqual(200);
+  });
+});
+
+// describe('GET /recommendations', () => {});
+
+// describe('GET /recommendations/:id', () => {});
+
+// describe('GET /recommendations/random', () => {});
+
+// describe('GET /recommendations/top/:amount', () => {});
 
 afterAll(async () => {
   await prisma.$disconnect();
