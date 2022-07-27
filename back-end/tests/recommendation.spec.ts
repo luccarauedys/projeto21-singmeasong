@@ -79,9 +79,39 @@ describe('POST /recommendations/:id/downvote', () => {
   });
 });
 
-// describe('GET /recommendations', () => {});
+describe('GET /recommendations', () => {
+  it('should return a status 200 when operation is successful', async () => {
+    const { statusCode } = await agent.get('/recommendations');
+    expect(statusCode).toEqual(200);
+  });
+});
 
-// describe('GET /recommendations/:id', () => {});
+describe('GET /recommendations/:id', () => {
+  it('should return a status 400 when id is NaN', async () => {
+    const URL = '/recommendations/undefined';
+    const { statusCode } = await agent.get(URL);
+    expect(statusCode).toEqual(400);
+  });
+
+  it('should return a status 404 when recommendation does not exist', async () => {
+    const URL = '/recommendations/0';
+    const { statusCode } = await agent.get(URL);
+    expect(statusCode).toEqual(404);
+  });
+
+  it('should return an object with properties id, name, youtubeLink and score when recommendation exists', async () => {
+    const id = await createRecommendationAndGetId();
+    const URL = `/recommendations/${id}`;
+
+    const { statusCode, body } = await agent.get(URL);
+
+    expect(statusCode).toEqual(200);
+    expect(body).toHaveProperty('id');
+    expect(body).toHaveProperty('name');
+    expect(body).toHaveProperty('youtubeLink');
+    expect(body).toHaveProperty('score');
+  });
+});
 
 // describe('GET /recommendations/random', () => {});
 

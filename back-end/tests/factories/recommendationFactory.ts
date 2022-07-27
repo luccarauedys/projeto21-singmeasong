@@ -19,3 +19,8 @@ export async function createRecommendationAndGetId() {
   const result = await prisma.recommendation.create({ data: recommendation });
   return result.id;
 }
+
+// export async function getRecommendations() {
+//   const recommendations = await prisma.recommendation.findMany();
+//   return recommendations;
+// }
