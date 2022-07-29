@@ -1,4 +1,4 @@
-import { prisma } from '../../src/database.js';
+import prisma from '../../src/config/database.js';
 
 export function validData() {
   return {
@@ -45,4 +45,39 @@ export async function createRecommendations() {
   });
 
   return recommendations;
+}
+
+export function getRecommendations() {
+  return [
+    {
+      id: 1,
+      name: 'Twenty One Pilots - Chlorine',
+      youtubeLink: 'https://www.youtube.com/watch?v=eJnQBXmZ7Ek',
+      score: 20,
+    },
+    {
+      id: 2,
+      name: 'Gotye - Somebody That I Used To Know',
+      youtubeLink: 'https://www.youtube.com/watch?v=8UVNT4wvIGY',
+      score: 8,
+    },
+    {
+      id: 3,
+      name: 'Hozier - Take Me To Church',
+      youtubeLink: 'https://www.youtube.com/watch?v=PVjiKRfKpPI',
+      score: 5,
+    },
+    {
+      id: 4,
+      name: 'Imagine Dragons - Wrecked',
+      youtubeLink: 'https://www.youtube.com/watch?v=Y2NkuFIlLEo',
+      score: 10,
+    },
+    {
+      id: 5,
+      name: 'Twenty One Pilots - Shy Away',
+      youtubeLink: 'https://www.youtube.com/watch?v=3sO-Y1Zbft4',
+      score: 14,
+    },
+  ];
 }

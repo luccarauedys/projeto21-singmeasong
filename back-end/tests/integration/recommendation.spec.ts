@@ -1,15 +1,15 @@
 import supertest from 'supertest';
 
-import app from '../src/app.js';
+import app from '../../src/app.js';
 
-import { prisma } from '../src/database.js';
+import prisma from '../../src/config/database.js';
 
 import {
   validData,
   invalidData,
   createRecommendationAndGetId,
   createRecommendations,
-} from './factories/recommendationFactory.js';
+} from '../factories/recommendationFactory.js';
 
 const agent = supertest(app);
 
