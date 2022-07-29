@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest -i",
-    "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest -i --coverage --testPathPattern=tests/unit"
+    "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest -i --coverage --watchAll --testPathPattern=tests/unit"
   },
   "keywords": [],
   "author": "",

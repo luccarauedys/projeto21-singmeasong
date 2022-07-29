@@ -7,9 +7,16 @@ describe('recommendationService test suite', () => {
   const recommendationData = getRecommendations()[0];
   const createRecommendationData = validData();
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.resetAllMocks();
+  });
+
   describe('insert', () => {
     it('should throw a conflict error when recommendation already exists', async () => {
-      jest.spyOn(recommendationRepository, 'findByName').mockResolvedValueOnce(recommendationData);
+      jest
+        .spyOn(recommendationRepository, 'findByName')
+        .mockResolvedValueOnce(recommendationData);
 
       await expect(recommendationService.insert(recommendationData)).rejects.toEqual({
         message: 'Recommendations names must be unique',
@@ -41,7 +48,9 @@ describe('recommendationService test suite', () => {
     });
 
     it('should upvote when recommendation exists', async () => {
-      jest.spyOn(recommendationRepository, 'find').mockResolvedValueOnce(recommendationData);
+      jest
+        .spyOn(recommendationRepository, 'find')
+        .mockResolvedValueOnce(recommendationData);
 
       const fnUpdate = jest
         .spyOn(recommendationRepository, 'updateScore')
@@ -64,7 +73,9 @@ describe('recommendationService test suite', () => {
     });
 
     it('should downvote when recommendation exists', async () => {
-      jest.spyOn(recommendationRepository, 'find').mockResolvedValueOnce(recommendationData);
+      jest
+        .spyOn(recommendationRepository, 'find')
+        .mockResolvedValueOnce(recommendationData);
 
       const fnUpdate = jest
         .spyOn(recommendationRepository, 'updateScore')
@@ -78,7 +89,9 @@ describe('recommendationService test suite', () => {
     it('should remove a recommendation when score is less than -5', async () => {
       const recommendationToRemove = { ...recommendationData, score: -6 };
 
-      jest.spyOn(recommendationRepository, 'find').mockResolvedValueOnce(recommendationToRemove);
+      jest
+        .spyOn(recommendationRepository, 'find')
+        .mockResolvedValueOnce(recommendationToRemove);
 
       jest
         .spyOn(recommendationRepository, 'updateScore')
@@ -91,6 +104,27 @@ describe('recommendationService test suite', () => {
       await recommendationService.downvote(recommendationData.id);
 
       expect(fnRemove).toHaveBeenCalledWith(recommendationData.id);
+    });
+  });
+
+  describe('getById', () => {
+    it('should fail when id does not exist', async () => {
+      jest.spyOn(recommendationRepository, 'find').mockResolvedValueOnce(undefined);
+
+      await expect(recommendationService.getById(recommendationData.id)).rejects.toEqual({
+        message: '',
+        type: 'not_found',
+      });
+    });
+
+    it('should get recommendation when id exists', async () => {
+      const fnFind = jest
+        .spyOn(recommendationRepository, 'find')
+        .mockResolvedValueOnce(recommendationData);
+
+      await recommendationService.getById(recommendationData.id);
+
+      expect(fnFind).toHaveBeenCalledWith(recommendationData.id);
     });
   });
 
@@ -122,9 +156,7 @@ describe('recommendationService test suite', () => {
 
   describe('getRandom', () => {
     it('should throw a not found error when there are no recommendations', async () => {
-      const fnFindAll = jest.spyOn(recommendationRepository, 'findAll').mockResolvedValueOnce([]);
-
-      expect(fnFindAll).toBeCalled();
+      jest.spyOn(recommendationRepository, 'findAll').mockResolvedValue([]);
 
       await expect(recommendationService.getRandom()).rejects.toEqual({
         message: '',
@@ -132,21 +164,58 @@ describe('recommendationService test suite', () => {
       });
     });
 
-    it('should return a random recommendation', async () => {
-      const recommendations = getRecommendations();
+    it('should call findAll with param "gt" when generated random number < 0.7', async () => {
+      jest.spyOn(Math, 'random').mockReturnValueOnce(0.6);
 
       const fnFindAll = jest
         .spyOn(recommendationRepository, 'findAll')
+        .mockResolvedValueOnce([recommendationData]);
+
+      await recommendationService.getRandom();
+
+      expect(fnFindAll).toHaveBeenCalledWith({ score: 10, scoreFilter: 'gt' });
+    });
+
+    it('should call findAll with param "lte" when generated random number >= 0.7', async () => {
+      jest.spyOn(Math, 'random').mockReturnValueOnce(0.7);
+
+      const fnFindAll = jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockResolvedValueOnce([recommendationData]);
+
+      await recommendationService.getRandom();
+
+      expect(fnFindAll).toHaveBeenCalledWith({ score: 10, scoreFilter: 'lte' });
+    });
+
+    it('should call findAll twice when there are no recommendations that matches score filter', async () => {
+      const recommendations = getRecommendations();
+
+      jest.spyOn(Math, 'random').mockReturnValueOnce(0.5);
+      jest.spyOn(Math, 'floor').mockReturnValueOnce(1);
+
+      const fnFindAll = jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockResolvedValueOnce([])
         .mockResolvedValueOnce(recommendations);
+
+      await recommendationService.getRandom();
+
+      expect(fnFindAll).toHaveBeenCalledTimes(2);
+    });
+
+    it('should return a random recommendation', async () => {
+      const recommendations = getRecommendations();
+
+      jest
+        .spyOn(recommendationRepository, 'findAll')
+        .mockResolvedValueOnce(recommendations);
+
+      jest.spyOn(Math, 'floor').mockReturnValue(3);
 
       const result = await recommendationService.getRandom();
 
-      expect(fnFindAll).toBeCalled();
-      expect(result).toBeTruthy();
-      expect(result).toHaveProperty('id');
-      expect(result).toHaveProperty('name');
-      expect(result).toHaveProperty('youtubeLink');
-      expect(result).toHaveProperty('score');
+      expect(result).toEqual(recommendations[3]);
     });
   });
 });
