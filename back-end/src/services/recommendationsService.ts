@@ -6,7 +6,7 @@ export type CreateRecommendationData = Omit<Recommendation, 'id' | 'score'>;
 
 async function insert(createRecommendationData: CreateRecommendationData) {
   const existingRecommendation = await recommendationRepository.findByName(
-    createRecommendationData.name
+    createRecommendationData.name,
   );
 
   if (existingRecommendation) throw conflictError('Recommendations names must be unique');
@@ -23,7 +23,10 @@ async function upvote(id: number) {
 async function downvote(id: number) {
   await getByIdOrFail(id);
 
-  const updatedRecommendation = await recommendationRepository.updateScore(id, 'decrement');
+  const updatedRecommendation = await recommendationRepository.updateScore(
+    id,
+    'decrement',
+  );
 
   if (updatedRecommendation.score < -5) {
     await recommendationRepository.remove(id);

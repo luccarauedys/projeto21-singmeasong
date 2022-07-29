@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
+    "dev:test": "dotenv -e .env.test nodemon src/server.ts",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest -i",
     "test:unit": "NODE_OPTIONS=--experimental-vm-modules jest -i --coverage --watchAll --testPathPattern=tests/unit"
   },

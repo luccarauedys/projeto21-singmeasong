@@ -67,6 +67,42 @@ async function remove(id: number) {
   });
 }
 
+async function removeAll() {
+  return await prisma.recommendation.deleteMany();
+}
+
+async function createMany() {
+  const recommendations = [
+    {
+      name: 'Twenty One Pilots - Chlorine',
+      youtubeLink: 'https://www.youtube.com/watch?v=eJnQBXmZ7Ek',
+      score: 150,
+    },
+    {
+      name: 'Gotye - Somebody That I Used To Know',
+      youtubeLink: 'https://www.youtube.com/watch?v=8UVNT4wvIGY',
+      score: 99,
+    },
+    {
+      name: 'Hozier - Take Me To Church',
+      youtubeLink: 'https://www.youtube.com/watch?v=PVjiKRfKpPI',
+      score: 80,
+    },
+    {
+      name: 'Imagine Dragons - Wrecked',
+      youtubeLink: 'https://www.youtube.com/watch?v=Y2NkuFIlLEo',
+      score: 120,
+    },
+    {
+      name: 'Twenty One Pilots - Shy Away',
+      youtubeLink: 'https://www.youtube.com/watch?v=3sO-Y1Zbft4',
+      score: 108,
+    },
+  ];
+
+  return await prisma.recommendation.createMany({ data: recommendations });
+}
+
 export const recommendationRepository = {
   create,
   findAll,
@@ -75,4 +111,6 @@ export const recommendationRepository = {
   updateScore,
   getAmountByScore,
   remove,
+  removeAll,
+  createMany,
 };
